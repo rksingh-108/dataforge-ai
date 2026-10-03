@@ -1,0 +1,4 @@
+# DataForge AI is a private, authenticated workspace.
+# Crawling is not permitted.
+User-agent: *
+Disallow: /

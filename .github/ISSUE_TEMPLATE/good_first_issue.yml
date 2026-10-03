@@ -1,0 +1,64 @@
+name: Good first issue
+description: A small, well-scoped task suitable for a new contributor or intern.
+title: "[Good first issue] "
+labels: ["good first issue", "onboarding"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for tasks that a new contributor can complete in one or
+        two days **without** deep system knowledge. If it requires judgment about
+        tenancy, authorization, SQL safety or cryptography, it is not a good
+        first issue.
+
+  - type: input
+    id: area
+    attributes:
+      label: Owning area and mentor
+      description: e.g. "Frontend — @mentor"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Where should the contributor look? Link the exact files and docs.
+    validations:
+      required: true
+
+  - type: textarea
+    id: task
+    attributes:
+      label: The task
+      description: Concrete and unambiguous. One deliverable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: |
+        - [ ] ...
+        - [ ] Tests added and passing (`make test-backend` / `make test-web`)
+        - [ ] Relevant docs updated
+    validations:
+      required: true
+
+  - type: textarea
+    id: hints
+    attributes:
+      label: Hints and gotchas
+      description: Anything that would otherwise cost a new contributor hours.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ### Before you start
+
+        1. Read [docs/onboarding/new-developer.md](../../docs/onboarding/new-developer.md).
+        2. Create a branch: `git switch -c feat/<short-description>`.
+        3. Open a draft PR early — ask the mentor rather than guessing.

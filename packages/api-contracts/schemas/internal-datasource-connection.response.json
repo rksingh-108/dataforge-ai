@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dataforge.ai/contracts/internal-datasource-connection.response.json",
+  "title": "DataSourceConnectionResponse",
+  "description": "Response of GET /internal/datasources/{id}/connection (API -> AI service). Contains a decrypted credential and must never be returned to a browser.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["connection", "is_read_only"],
+  "properties": {
+    "connection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["engine", "host", "port", "database", "username", "password"],
+      "properties": {
+        "engine": { "enum": ["postgresql", "mysql"] },
+        "host": { "type": "string" },
+        "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+        "database": { "type": "string" },
+        "username": { "type": "string" },
+        "password": { "type": "string", "description": "Decrypted at rest and in transit; audited on every access." },
+        "ssl_mode": { "type": "string" }
+      }
+    },
+    "is_read_only": {
+      "const": true,
+      "description": "The AI service is only ever permitted to read. This is asserted, not advisory."
+    }
+  }
+}

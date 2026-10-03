@@ -1,0 +1,20 @@
+{
+  "$comment": "Canonical toolchain versions for DataForge AI. CI reads these so a local run and a pipeline run use the same versions. Contains no secrets.",
+  "python": "3.14",
+  "pythonMinimum": "3.13",
+  "node": "22",
+  "postgres": "16",
+  "pgvector": "0.8",
+  "redis": "7",
+  "servicePorts": {
+    "web": 3000,
+    "api": 8000,
+    "aiService": 8001,
+    "postgres": 5432,
+    "redis": 6379
+  },
+  "testDatabase": {
+    "$comment": "Port used by scripts/testing/run-backend-tests.sh for the throwaway pgvector container.",
+    "port": 55432
+  }
+}

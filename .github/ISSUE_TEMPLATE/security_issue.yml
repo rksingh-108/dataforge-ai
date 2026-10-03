@@ -1,0 +1,71 @@
+name: Security issue (read this first)
+description: Use this only for non-sensitive security hygiene work. Report vulnerabilities privately.
+title: "[Security] "
+labels: ["type: security", "status: triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Stop — is this a vulnerability?
+
+        If this is an exploitable vulnerability, **do not open a public issue**.
+        Follow the private process in [SECURITY.md](../../SECURITY.md)
+        (email `security@dataforge.example` with the details) and give us time to
+        respond before disclosing anything publicly.
+
+        Use this template only for non-sensitive work such as:
+        - hardening a dependency or configuration,
+        - adding or improving a security test,
+        - documenting an existing control,
+        - tracking a remediation that is already public.
+
+  - type: checkboxes
+    id: acknowledgement
+    attributes:
+      label: Confirmation
+      options:
+        - label: This issue does not describe an unpatched exploitable vulnerability.
+          required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Authentication / session
+        - Authorization / RBAC
+        - Tenant isolation
+        - SQL injection / query safety
+        - SSRF / outbound network
+        - File upload
+        - Prompt injection / AI tool abuse
+        - Secrets management
+        - Dependency vulnerability
+        - Security configuration / headers
+        - Audit logging
+        - Not listed
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is the issue, and what is the realistic impact?
+    validations:
+      required: true
+
+  - type: textarea
+    id: remediation
+    attributes:
+      label: Proposed remediation
+    validations:
+      required: true
+
+  - type: textarea
+    id: test
+    attributes:
+      label: How remediation will be verified
+      description: A failing security test first, then the fix. Describe the test.
+    validations:
+      required: true

@@ -1,0 +1,136 @@
+# =============================================================================
+# DataForge AI — local development stack
+# -----------------------------------------------------------------------------
+#   cp .env.example .env      # fill in secrets
+#   docker compose up --build
+#
+# Services: db (Postgres+pgvector), redis, api, worker, ai-service, web.
+# The api container runs migrations on start; seeding is a separate command:
+#   docker compose exec api python manage.py seed_development
+# =============================================================================
+name: dataforge
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dataforge}
+      POSTGRES_USER: ${POSTGRES_USER:-dataforge}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dataforge} -d ${POSTGRES_DB:-dataforge}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_HOST_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    env_file: [.env]
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      CHANNELS_REDIS_URL: redis://redis:6379/0
+      AI_SERVICE_URL: http://ai-service:8001
+      DJANGO_SETTINGS_MODULE: config.settings.development
+    volumes:
+      - media:/app/media
+    ports:
+      - "${API_HOST_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    command: ["celery", "-A", "config", "worker", "-l", "info", "--concurrency", "2"]
+    # The worker shares the API image, whose healthcheck curls the API's HTTP
+    # port. Celery listens on no HTTP port, so that check would report the worker
+    # unhealthy forever. Ping the worker through Celery instead.
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A config inspect ping -d celery@$$HOSTNAME || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+    env_file: [.env]
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      AI_SERVICE_URL: http://ai-service:8001
+      DJANGO_SETTINGS_MODULE: config.settings.development
+    volumes:
+      - media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_started
+    restart: unless-stopped
+
+  ai-service:
+    build:
+      context: .
+      dockerfile: apps/ai-service/Dockerfile
+    env_file: [.env]
+    environment:
+      INTERNAL_API_BASE_URL: http://api:8000
+    ports:
+      - "${AI_SERVICE_HOST_PORT:-8001}:8001"
+    depends_on:
+      api:
+        condition: service_started
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      # Server-side only: the browser never talks to the API directly.
+      API_BASE_URL: http://api:8000
+      NODE_ENV: production
+    ports:
+      - "${WEB_HOST_PORT:-3000}:3000"
+    depends_on:
+      api:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  redis_data:
+  media:

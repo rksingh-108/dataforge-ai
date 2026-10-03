@@ -1,0 +1,26 @@
+# DataForge AI — API (Django modular monolith) runtime dependencies.
+# Pin major/minor, allow patch updates for security fixes.
+Django>=5.2,<6.1
+djangorestframework>=3.15,<4.0
+djangorestframework-simplejwt>=5.3,<6.0
+django-cors-headers>=4.3,<5.0
+django-filter>=24.2
+django-celery-beat>=2.6,<3.0
+
+# ASGI: Daphne serves HTTP+WebSocket; Channels provides the layer.
+# `daphne` is first in INSTALLED_APPS (see config/settings/base.py) and is the
+# process manager in the image CMD, so it must be installed explicitly.
+daphne>=4.1,<5.0
+channels>=4.1,<5.0
+channels-redis>=4.2,<5.0
+
+psycopg[binary]>=3.2,<4.0
+
+# pgvector supplies VectorField/HnswIndex for document embeddings.
+pgvector>=0.3,<1.0
+
+redis>=5.0,<7.0
+celery>=5.4,<6.0
+cryptography>=43.0
+python-dotenv>=1.0,<2.0
+requests>=2.32,<3.0

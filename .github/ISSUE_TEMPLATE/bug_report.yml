@@ -1,0 +1,71 @@
+name: Bug report
+description: Something is broken or behaves incorrectly.
+title: "[Bug] "
+labels: ["type: bug", "status: triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not report security vulnerabilities here.** See
+        [SECURITY.md](../../SECURITY.md) for the private reporting process.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the product is affected?
+      options:
+        - Web / frontend
+        - API / backend
+        - AI service / RAG
+        - Data sources
+        - Documents
+        - Authentication / authorization
+        - Infrastructure / CI
+        - Documentation
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the actual behaviour, including any error message or request id.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      placeholder: |
+        1. Sign in as ...
+        2. Go to ...
+        3. ...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+      description: Git SHA, tag, or "local main".
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Redact credentials, tokens and customer data before pasting.
+      render: shell
+    validations:
+      required: false

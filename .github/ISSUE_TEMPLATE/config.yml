@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability (private)
+    url: https://github.com/dataforge/dataforge-ai/security/advisories/new
+    about: Never report an exploitable vulnerability in a public issue. See SECURITY.md.
+  - name: Read the onboarding guide first
+    url: https://github.com/dataforge/dataforge-ai/blob/main/docs/onboarding/new-developer.md
+    about: New here? Start with the onboarding documentation.

@@ -1,0 +1,55 @@
+# =============================================================================
+# DataForge AI — code owners
+# -----------------------------------------------------------------------------
+# Teams are mapped to the ownership model in docs/architecture/service-boundaries.md.
+# Replace the placeholder teams with your real GitHub teams before enabling
+# required reviews. The structure below is the contract, not the group names.
+#
+# Default rule: anything not matched below requires a review from the platform
+# team, so no path is left unowned.
+# =============================================================================
+
+*                                   @dataforge/platform
+
+# --- Frontend ----------------------------------------------------------------
+/apps/web/                          @dataforge/frontend
+/packages/shared-types/             @dataforge/frontend @dataforge/backend
+
+# --- Backend / domain ---------------------------------------------------------
+/apps/api/                          @dataforge/backend
+/apps/api/apps/common/              @dataforge/backend @dataforge/security
+/apps/api/apps/accounts/            @dataforge/backend @dataforge/security
+/apps/api/apps/organizations/       @dataforge/backend @dataforge/security
+
+# --- AI / RAG -----------------------------------------------------------------
+/apps/ai-service/                   @dataforge/ai
+/apps/ai-service/ai_service/sql/    @dataforge/ai @dataforge/security
+/apps/ai-service/ai_service/security/ @dataforge/ai @dataforge/security
+/packages/api-contracts/            @dataforge/ai @dataforge/backend
+
+# --- Data / database ----------------------------------------------------------
+/database/                          @dataforge/data
+/apps/api/apps/*/migrations/        @dataforge/data @dataforge/backend
+
+# --- DevOps -------------------------------------------------------------------
+/infrastructure/                    @dataforge/devops
+/.github/                           @dataforge/devops
+/docker-compose.yml                 @dataforge/devops
+/scripts/deployment/                @dataforge/devops
+/scripts/database/                  @dataforge/data
+
+# --- Security -----------------------------------------------------------------
+/security/                          @dataforge/security
+/tests/security/                    @dataforge/security @dataforge/qa
+/apps/api/apps/common/crypto.py     @dataforge/security
+/apps/ai-service/ai_service/connections/ @dataforge/ai @dataforge/security
+
+# --- QA -----------------------------------------------------------------------
+/tests/                             @dataforge/qa
+/scripts/testing/                   @dataforge/qa @dataforge/devops
+
+# --- Documentation ------------------------------------------------------------
+/docs/                              @dataforge/docs
+/CONTRIBUTING.md                    @dataforge/docs @dataforge/platform
+/SECURITY.md                        @dataforge/security
+/README.md                          @dataforge/docs @dataforge/platform

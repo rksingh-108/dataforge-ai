@@ -1,0 +1,88 @@
+# =============================================================================
+# DataForge AI — repository-wide Python tooling configuration
+# -----------------------------------------------------------------------------
+# This file is the single source of truth for Python linting/formatting across
+# ALL services (`apps/api`, `apps/ai-service`) and `scripts/`. It is deliberately
+# explicit: the rule set is pinned here rather than inherited from Ruff's
+# defaults, which changed substantially in 0.16 (59 -> 413 default rules). An
+# explicit `select` means a Ruff upgrade cannot silently change what CI enforces.
+#
+# CI runs:  ruff check apps/api apps/ai-service
+# Makefile: make lint
+# =============================================================================
+
+[tool.ruff]
+line-length = 100
+# Matches the runtime: apps/*/Dockerfile use python:3.14-slim and CI pins 3.14.
+target-version = "py314"
+extend-exclude = ["node_modules", ".venv", ".venv-ai", "media", "staticfiles", "**/migrations/**"]
+
+[tool.ruff.lint]
+# High-signal families only. Framework-specific and opinionated families
+# (e.g. pydocstyle `D`, pylint `PL`, `SLF`, `BLE`) are intentionally NOT enabled
+# so that the enforced set stays meaningful and reviewable.
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "RUF", # Ruff-specific
+    "RET", # flake8-return
+    "PIE", # flake8-pie
+    "TID", # flake8-tidy-imports
+]
+ignore = [
+    # The formatter owns line length; the linter should not duplicate it.
+    "E501",
+    # Django and DRF read class attributes through metaclasses
+    # (Meta.ordering, Meta.indexes, view.authentication_classes, ...). Annotating
+    # them as ClassVar, which is what RUF012 suggests, is semantically wrong here.
+    "RUF012",
+    # Django and DRF idiomatically call functions in argument defaults
+    # (DEFAULT_AUTO_FIELD, serializer field defaults, settings helpers).
+    "B008",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["apps", "config", "ai_service"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests legitimately use long lines and throwaway unpacking; these add no signal.
+"**/tests/**" = ["E501"]
+"**/test_*.py" = ["E501"]
+"**/conftest.py" = ["E501"]
+
+# =============================================================================
+# Bandit — Python security static analysis
+# -----------------------------------------------------------------------------
+# Run as:  bandit -c pyproject.toml -q -r apps/api/apps apps/ai-service/ai_service
+# CI (.github/workflows/security.yml) and scripts/dev/run-security-checks.sh both
+# use this config, so a local run and a pipeline run agree.
+#
+# The scan is ENFORCING: any non-skipped finding fails the build.
+# =============================================================================
+[tool.bandit]
+# Tests are not shipped and deliberately contain fixtures, so they are excluded
+# from the security scan rather than blanket-skipped.
+exclude_dirs = ["tests", "migrations"]
+
+# Each skip is a documented false positive or a deliberately accepted risk.
+# Anything not listed here must be fixed, not suppressed.
+skips = [
+    # B105/B106: bandit flags any variable or keyword named `password` as a
+    # hard-coded credential. Every hit is either a field name, a function
+    # parameter, a test fixture, or the intentionally-public development seed
+    # password (see apps/api/apps/accounts/management/commands/seed_development.py,
+    # which refuses to run unless DEBUG is on). No production secret is embedded.
+    "B105",
+    "B106",
+    # B608: the row cap in ai_service/sql/validator.py is interpolated into an
+    # f-string, but the value is an int validated to be within SQL_MAX_ROWS and
+    # the statement has already been rewritten from a sqlglot AST. It is not
+    # user-controlled SQL. Covered by tests/test_sql_validator.py.
+    "B608",
+]

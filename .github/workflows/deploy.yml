@@ -1,0 +1,82 @@
+name: Deploy
+
+# Deployment is intentionally gated and non-functional until a target
+# environment is configured. It is included so the pipeline shape is visible and
+# reviewed; see docs/deployment/README.md for what must be provided before it can
+# run. Nothing here deploys anywhere by default.
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        type: choice
+        options: [staging, production]
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-publish:
+    name: Build and publish images
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Derive image tag
+        id: meta
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "version=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=sha-${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Log in to the container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.CONTAINER_REGISTRY || 'ghcr.io' }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push API
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          push: true
+          tags: ${{ vars.CONTAINER_REGISTRY || 'ghcr.io' }}/${{ github.repository }}/api:${{ steps.meta.outputs.version }}
+      - name: Build and push AI service
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/ai-service/Dockerfile
+          push: true
+          tags: ${{ vars.CONTAINER_REGISTRY || 'ghcr.io' }}/${{ github.repository }}/ai-service:${{ steps.meta.outputs.version }}
+      - name: Build and push web
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          push: true
+          tags: ${{ vars.CONTAINER_REGISTRY || 'ghcr.io' }}/${{ github.repository }}/web:${{ steps.meta.outputs.version }}
+
+  deploy:
+    name: Deploy (manual gate)
+    runs-on: ubuntu-latest
+    needs: [build-and-publish]
+    environment: ${{ inputs.environment || 'staging' }}
+    # Requires a self-hosted runner or an environment with deployment secrets.
+    # Disabled until DEPLOY_ENABLED is set to 'true' as a repository variable.
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply migrations
+        run: echo "Run migrations against the target environment here."
+      - name: Roll out services
+        run: echo "Apply the new image tag ${{ needs.build-and-publish.outputs.version }}."
+      - name: Smoke test
+        run: echo "Hit /_health/ on each service and fail the job on a non-200."

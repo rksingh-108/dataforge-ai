@@ -1,0 +1,67 @@
+name: Feature request
+description: Propose a new capability or an improvement.
+title: "[Feature] "
+labels: ["type: feature", "status: triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        DataForge AI deliberately keeps a focused feature set. Proposals that add
+        breadth without strengthening the core (secure data intelligence with
+        auditable AI) are likely to be declined. Explain the *problem* first.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What can't users do today? Who is affected and how often?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Including "do nothing" and any smaller change that would suffice.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Owning area
+      options:
+        - Frontend (apps/web)
+        - Backend (apps/api)
+        - AI (apps/ai-service)
+        - Data (database)
+        - DevOps (infrastructure, .github)
+        - Security
+        - QA / testing
+        - Documentation
+        - Cross-cutting
+    validations:
+      required: true
+
+  - type: textarea
+    id: security
+    attributes:
+      label: Security and privacy considerations
+      description: New data collected? New outbound calls? New permissions? New tenant-scoped data?
+    validations:
+      required: true
+
+  - type: textarea
+    id: dod
+    attributes:
+      label: How we will know it is done
+      description: Concrete, testable acceptance criteria.
+    validations:
+      required: true

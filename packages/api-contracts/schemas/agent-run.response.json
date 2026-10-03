@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dataforge.ai/contracts/agent-run.response.json",
+  "title": "AgentRunResponse",
+  "description": "Response of POST /v1/agent/run (AI service -> API).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["answer", "steps", "provider", "model", "total_tokens"],
+  "properties": {
+    "answer": {
+      "type": "string",
+      "description": "The final answer. Never contains private chain-of-thought."
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["index", "tool", "status"],
+        "properties": {
+          "index": { "type": "integer", "minimum": 0 },
+          "tool": { "type": "string" },
+          "title": { "type": "string" },
+          "status": { "enum": ["pending", "running", "succeeded", "failed"] },
+          "input_summary": {
+            "type": "object",
+            "description": "Redacted view of the tool arguments. Must never contain credentials."
+          },
+          "output_summary": {
+            "type": "object",
+            "description": "High-level result metadata (row counts, match counts, flags)."
+          },
+          "duration_ms": { "type": "integer", "minimum": 0 },
+          "error": { "type": "string" }
+        }
+      }
+    },
+    "provider": { "type": "string", "description": "Provider adapter name, e.g. 'openai_compatible'." },
+    "model": { "type": "string" },
+    "total_tokens": { "type": "integer", "minimum": 0 },
+    "budget_exhausted": {
+      "type": "boolean",
+      "description": "Present when the iteration budget was reached before the model produced a final answer."
+    }
+  }
+}

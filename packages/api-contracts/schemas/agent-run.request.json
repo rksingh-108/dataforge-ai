@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dataforge.ai/contracts/agent-run.request.json",
+  "title": "AgentRunRequest",
+  "description": "Body of POST /v1/agent/run (API -> AI service).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["question", "organization_id"],
+  "properties": {
+    "question": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "description": "The user's natural-language question."
+    },
+    "organization_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Must match the X-DataForge-Org header."
+    },
+    "datasource_ids": {
+      "type": "array",
+      "items": { "type": "string", "format": "uuid" },
+      "default": [],
+      "description": "Already filtered by the API to data sources the organization owns. The AI service refuses any id outside this set."
+    },
+    "datasource_names": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Optional id -> display name map, used only to make the prompt readable."
+    },
+    "document_ids": {
+      "type": "array",
+      "items": { "type": "string", "format": "uuid" },
+      "default": [],
+      "description": "Restrict retrieval to these documents. Empty means all ready documents."
+    },
+    "use_documents": {
+      "type": "boolean",
+      "default": true,
+      "description": "When false, the document search tool is not offered to the model at all."
+    },
+    "execution_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Correlates the run with the API's execution record. Informational only; the API owns the record."
+    }
+  }
+}
