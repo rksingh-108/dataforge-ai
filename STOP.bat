@@ -18,7 +18,8 @@ REM  the next START.bat brings the same environment back.
 REM
 REM  To start again:  START.bat
 REM
-REM  Usage:  STOP.bat
+REM  Usage:  STOP.bat        (works from any directory: the script cd's to its
+REM                           own folder via %~dp0 before doing anything)
 REM ============================================================================
 
 setlocal EnableDelayedExpansion
@@ -45,7 +46,7 @@ if errorlevel 1 (
     echo   [ERROR] Docker was not found on PATH, so the stack cannot be stopped.
     echo   Install Docker Desktop: https://docs.docker.com/get-docker/
     echo.
-    exit /b 1
+    goto :fail
 )
 
 docker info >nul 2>&1
@@ -55,7 +56,8 @@ if errorlevel 1 (
     echo          already closed, the containers are already stopped - nothing
     echo          to do. Otherwise start Docker Desktop and run STOP.bat again.
     echo.
-    exit /b 0
+    set "RC=0"
+    goto :done
 )
 echo       Docker is available.
 echo.
@@ -88,10 +90,23 @@ if errorlevel 1 (
     %COMPOSE% ps
     echo   Retry with:  %COMPOSE% stop
     echo.
-    exit /b 1
+    goto :fail
 )
 echo.
-echo       Services stopped.
+
+REM Verify the stop actually took effect: no service may still be running.
+set "STILL_RUNNING="
+for /f "delims=" %%i in ('%COMPOSE% ps --status running -q 2^>nul') do set "STILL_RUNNING=%%i"
+
+if defined STILL_RUNNING (
+    echo   [ERROR] Some services are still running after "docker compose stop":
+    %COMPOSE% ps
+    echo.
+    goto :fail
+)
+
+echo       Services stopped. Current status:
+%COMPOSE% ps -a --format "      {{.Service}}: {{.State}}"
 echo.
 
 :preserved
@@ -122,4 +137,32 @@ echo.
 echo   Volumes are only removed by an explicit, destructive command such as
 echo   "docker compose down -v" (or "make clean"). STOP.bat never does this.
 echo.
+set "RC=0"
+goto :done
+
+
+REM ===========================================================================
+REM  Exit handling
+REM ===========================================================================
+
+:fail
+set "RC=1"
+goto :done
+
+:done
+REM Keep the console window open when the script was launched by double-click.
+REM Explorer runs a double-clicked .bat as  cmd /c "<path>"  in a brand new
+REM console that closes the instant the script ends, so the user would otherwise
+REM see only a flash. In that case %CMDCMDLINE% contains this script's full path
+REM and we wait for a keypress. When the script is run from an already-open
+REM terminal the window stays open on its own, so scripted use is unaffected.
+call :maybe_pause
+exit /b %RC%
+
+:maybe_pause
+echo %CMDCMDLINE% | "%SystemRoot%\System32\find.exe" /i "%~f0" >nul
+if not errorlevel 1 (
+    echo.
+    pause
+)
 exit /b 0

@@ -14,7 +14,14 @@ REM
 REM  Safe to run repeatedly: `docker compose up -d` is idempotent, so an
 REM  already-running stack is left as-is.
 REM
-REM  Usage:  START.bat
+REM  Usage:  START.bat        (works from any directory: the script cd's to its
+REM                           own folder via %~dp0 before doing anything)
+REM
+REM  Windows note: this script never calls `timeout`. Git for Windows installs a
+REM  GNU `timeout.exe` that shadows the Windows one on PATH and rejects the `/t`
+REM  flag, and the real Windows `timeout.exe` refuses to run when stdin is
+REM  redirected (for example when the script's output is piped or captured).
+REM  Delays use the full path to Windows `ping.exe` instead, which always works.
 REM ============================================================================
 
 setlocal EnableDelayedExpansion
@@ -42,7 +49,7 @@ if errorlevel 1 (
     echo   [ERROR] Docker was not found on PATH.
     echo   Install Docker Desktop: https://docs.docker.com/get-docker/
     echo.
-    exit /b 1
+    goto :fail
 )
 
 docker info >nul 2>&1
@@ -51,7 +58,7 @@ if errorlevel 1 (
     echo   [ERROR] Docker is installed but the daemon is not reachable.
     echo   Start Docker Desktop and wait for it to report "running", then retry.
     echo.
-    exit /b 1
+    goto :fail
 )
 
 %COMPOSE% version >nul 2>&1
@@ -60,7 +67,7 @@ if errorlevel 1 (
     echo   [ERROR] "docker compose" is unavailable. Update Docker Desktop so that
     echo   the Compose v2 plugin is installed.
     echo.
-    exit /b 1
+    goto :fail
 )
 echo       Docker is available.
 echo.
@@ -77,7 +84,7 @@ if not exist "%PROJECT_ROOT%\.env" (
         echo.
         echo   [ERROR] Could not create .env from .env.example.
         echo.
-        exit /b 1
+        goto :fail
     )
     echo.
     echo   [ACTION REQUIRED] .env was created with placeholder values.
@@ -86,7 +93,7 @@ if not exist "%PROJECT_ROOT%\.env" (
     echo       INTERNAL_SERVICE_TOKEN
     echo   Then run START.bat again.
     echo.
-    exit /b 1
+    goto :fail
 )
 echo       Using existing .env.
 echo.
@@ -121,30 +128,41 @@ if errorlevel 1 (
     echo   ----------------------------------------------------------------------
     echo   Fix the error above, then run START.bat again.
     echo.
-    exit /b 1
+    goto :fail
 )
 echo.
 echo       Services started.
 echo.
 
 REM ---------------------------------------------------------------------------
-REM 5. Wait for readiness.
-REM     - db and redis expose Docker healthchecks, so we poll their health.
-REM     - api is "ready" when its /_health/ endpoint answers (it runs migrations
-REM       on start, so this can take a little while on a cold database).
+REM 5. Wait for readiness of ALL SIX services.
+REM     - db, redis, api, worker and ai-service expose Docker healthchecks, so
+REM       we poll their health status.
+REM     - web has no container healthcheck, so we poll its HTTP port instead.
 REM ---------------------------------------------------------------------------
-echo [5/6] Waiting for services to become ready...
+echo [5/6] Waiting for all six services to become ready...
+echo.
 
-call :wait_for_healthy db 60
+call :wait_healthy db 90
 if errorlevel 1 goto :not_ready
 
-call :wait_for_healthy redis 60
+call :wait_healthy redis 90
 if errorlevel 1 goto :not_ready
 
-call :wait_for_api
+call :wait_healthy api %HEALTH_TIMEOUT_SECONDS%
 if errorlevel 1 goto :not_ready
 
-echo       Database, cache and API are ready.
+call :wait_healthy worker %HEALTH_TIMEOUT_SECONDS%
+if errorlevel 1 goto :not_ready
+
+call :wait_healthy ai-service %HEALTH_TIMEOUT_SECONDS%
+if errorlevel 1 goto :not_ready
+
+call :wait_http web http://localhost:3000/ 120
+if errorlevel 1 goto :not_ready
+
+echo.
+echo       All six services are ready: db, redis, api, worker, ai-service, web.
 echo.
 
 REM ---------------------------------------------------------------------------
@@ -172,7 +190,8 @@ echo   Note: the AI service needs LLM_API_KEY / EMBEDDING_API_KEY in .env to
 echo   answer analyst questions. The stack runs without them; AI calls fail
 echo   with a clear error until they are set.
 echo.
-exit /b 0
+set "RC=0"
+goto :done
 
 
 REM ===========================================================================
@@ -191,45 +210,96 @@ echo   -------------------------------------------------------------------------
 echo   --------------------------------------------------------------------------
 echo   Inspect a single service with:  %COMPOSE% logs -f api
 echo.
-exit /b 1
+goto :fail
 
 
-:wait_for_healthy
-REM %1 = service name, %2 = timeout seconds. Polls the container healthcheck.
+:wait_healthy
+REM %1 = service name, %2 = timeout seconds.
+REM Polls the container's Docker healthcheck. A service without a healthcheck
+REM reports its run state instead, so this stays safe for such services.
 set "SVC=%~1"
 set "DEADLINE=%~2"
 set /a "WAITED=0"
-:wait_for_healthy_loop
+:wait_healthy_loop
 set "CID="
 for /f "delims=" %%i in ('%COMPOSE% ps -q %SVC% 2^>nul') do set "CID=%%i"
 if not defined CID (
     echo       [wait] %SVC%: container not created yet...
-    goto :wait_for_healthy_tick
+    goto :wait_healthy_tick
 )
-for /f "delims=" %%s in ('docker inspect --format "{{.State.Health.Status}}" !CID! 2^>nul') do set "STATUS=%%s"
+set "STATUS="
+for /f "delims=" %%s in ('docker inspect --format "{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}" !CID! 2^>nul') do set "STATUS=%%s"
 if /i "!STATUS!"=="healthy" (
-    echo       %SVC% is healthy.
+    echo       [ok]   %SVC% is healthy.
+    exit /b 0
+)
+if /i "!STATUS!"=="running" (
+    echo       [ok]   %SVC% is running.
     exit /b 0
 )
 echo       [wait] %SVC%: !STATUS!...
-:wait_for_healthy_tick
+:wait_healthy_tick
 if !WAITED! GEQ !DEADLINE! exit /b 1
-timeout /t 3 /nobreak >nul
+call :sleep 3
 set /a "WAITED+=3"
-goto :wait_for_healthy_loop
+goto :wait_healthy_loop
 
 
-:wait_for_api
-REM Polls the API health endpoint; the API applies migrations on start.
+:wait_http
+REM %1 = label, %2 = URL, %3 = timeout seconds. Polls an HTTP endpoint.
+set "LABEL=%~1"
+set "URL=%~2"
+set "DEADLINE=%~3"
 set /a "WAITED=0"
-:wait_for_api_loop
-curl -fsS http://localhost:8000/_health/ >nul 2>&1
+:wait_http_loop
+curl -fsS -o nul "%URL%"
 if not errorlevel 1 (
-    echo       api is healthy.
+    echo       [ok]   %LABEL% is serving at %URL%
     exit /b 0
 )
-echo       [wait] api: not ready yet...
-if !WAITED! GEQ %HEALTH_TIMEOUT_SECONDS% exit /b 1
-timeout /t 3 /nobreak >nul
+echo       [wait] %LABEL%: not responding yet...
+if !WAITED! GEQ !DEADLINE! exit /b 1
+call :sleep 3
 set /a "WAITED+=3"
-goto :wait_for_api_loop
+goto :wait_http_loop
+
+
+:sleep
+REM %1 = whole seconds to pause. Uses the full path to Windows ping.exe:
+REM   - Git for Windows ships a GNU `timeout.exe` that can shadow the Windows
+REM     one on PATH and does not understand `/t`.
+REM   - The real Windows `timeout.exe` fails when stdin is redirected (for
+REM     example when this script's output is piped or captured).
+REM ping has neither problem and needs no interactive console.
+set /a "PING_COUNT=%~1+1"
+if %PING_COUNT% LSS 2 set "PING_COUNT=2"
+"%SystemRoot%\System32\ping.exe" -n %PING_COUNT% 127.0.0.1 >nul 2>&1
+exit /b 0
+
+
+REM ===========================================================================
+REM  Exit handling
+REM ===========================================================================
+
+:fail
+set "RC=1"
+goto :done
+
+:done
+REM Keep the console window open when the script was launched by double-click.
+REM Explorer runs a double-clicked .bat as  cmd /c "<path>"  in a brand new
+REM console that closes the instant the script ends, so the user would otherwise
+REM see only a flash (and any error would be unreadable). In that case
+REM %CMDCMDLINE% contains this script's full path and we wait for a keypress.
+REM When the script is run from an already-open terminal the window stays open on
+REM its own, so no pause happens and scripted use is unaffected.
+call :maybe_pause
+exit /b %RC%
+
+:maybe_pause
+echo %CMDCMDLINE% | "%SystemRoot%\System32\find.exe" /i "%~f0" >nul
+if not errorlevel 1 (
+    echo.
+    pause
+)
+exit /b 0
