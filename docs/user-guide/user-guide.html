@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>DataForge AI — User Guide</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #09090b; color: #f4f1ea;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .serif { font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, Cambria, serif; }
+  .gold { color: #e0a33c; }
+  .muted { color: #a8a49b; }
+
+  .page { position: relative; width: 210mm; height: 297mm; padding: 16mm 16mm 14mm;
+    display: flex; flex-direction: column; page-break-after: always; overflow: hidden;
+    background:
+      radial-gradient(60% 45% at 50% -10%, rgba(224,163,60,0.10), transparent 70%),
+      radial-gradient(40% 40% at 100% 0%, rgba(224,163,60,0.05), transparent 70%),
+      #09090b; }
+  .page:last-child { page-break-after: auto; }
+
+  /* Cover */
+  .cover { justify-content: center; }
+  .logo { width: 76px; height: 76px; border-radius: 20px; background: #e0a33c;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 20px 60px -20px rgba(224,163,60,0.9); }
+  .logo svg { width: 42px; height: 42px; color: #1a1206; }
+  .eyebrow { text-transform: uppercase; letter-spacing: 0.3em; font-size: 11px;
+    font-weight: 700; color: #e0a33c; }
+  h1.title { font-size: 54px; line-height: 1.05; margin: 18px 0 0; font-weight: 500; }
+  .subtitle { font-size: 18px; color: #c6c2b8; margin-top: 14px; max-width: 130mm; }
+  .cover-meta { margin-top: 40mm; font-size: 12px; color: #8a867e; border-top: 1px solid #26262e; padding-top: 14px; }
+  .cover-meta strong { color: #f4f1ea; font-weight: 600; }
+
+  /* Headers */
+  .step-num { display: inline-flex; align-items: center; gap: 10px; font-size: 12px;
+    letter-spacing: 0.22em; text-transform: uppercase; color: #e0a33c; font-weight: 700; }
+  .step-num .badge { width: 26px; height: 26px; border-radius: 8px; background: rgba(224,163,60,0.14);
+    border: 1px solid rgba(224,163,60,0.3); display: inline-flex; align-items: center;
+    justify-content: center; color: #f0c98a; font-size: 13px; }
+  h2 { font-size: 30px; margin: 12px 0 0; font-weight: 500; line-height: 1.15; }
+  .lede { font-size: 13.5px; color: #c6c2b8; margin: 10px 0 0; line-height: 1.6; }
+
+  .shot { margin-top: 14px; border-radius: 12px; border: 1px solid #26262e; overflow: hidden;
+    background: #121216; box-shadow: 0 30px 70px -40px rgba(0,0,0,0.95); }
+  .shot img { display: block; width: 100%; height: auto; }
+
+  .mobile-wrap { display: flex; gap: 16mm; align-items: flex-start; }
+  .mobile-wrap .shot { width: 78mm; margin-top: 14px; }
+  .mobile-copy { flex: 1; }
+
+  .tips { margin-top: 14px; }
+  .tip { display: flex; gap: 10px; font-size: 12.5px; color: #c6c2b8; line-height: 1.55; margin-top: 8px; }
+  .tip .dot { color: #e0a33c; font-weight: 700; }
+  .k { color: #f0c98a; font-weight: 600; }
+
+  ul.plain { margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: #c6c2b8; line-height: 1.7; }
+  ul.plain li { margin-bottom: 3px; }
+
+  table.urls { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12.5px; }
+  table.urls th, table.urls td { text-align: left; padding: 9px 12px; border-bottom: 1px solid #26262e; }
+  table.urls th { color: #8a867e; text-transform: uppercase; letter-spacing: 0.08em; font-size: 10.5px; }
+  table.urls td:first-child { color: #f4f1ea; font-weight: 600; }
+  table.urls td code { color: #f0c98a; font-family: ui-monospace, Menlo, Consolas, monospace; }
+
+  .toc { margin-top: 18px; }
+  .toc-row { display: flex; justify-content: space-between; border-bottom: 1px solid #26262e;
+    padding: 8px 0; font-size: 13px; }
+  .toc-row span:first-child { color: #f4f1ea; }
+  .toc-row span:last-child { color: #8a867e; }
+
+  .footer-note { margin-top: auto; font-size: 11px; color: #8a867e; border-top: 1px solid #26262e; padding-top: 10px; }
+  .callout { border: 1px solid rgba(224,163,60,0.28); background: rgba(224,163,60,0.08);
+    border-radius: 12px; padding: 12px 14px; font-size: 12.5px; color: #e8e4da; margin-top: 14px; }
+  .callout b { color: #f0c98a; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="page cover">
+  <div class="logo">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7L12 2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 8.2 16.4 10.7v4.6L12 17.8 7.6 15.3v-4.6L12 8.2Z" fill="currentColor"/></svg>
+  </div>
+  <p class="eyebrow" style="margin-top:34px">User guide</p>
+  <h1 class="title serif">DataForge&nbsp;AI</h1>
+  <p class="subtitle">Ask your business data anything. This guide walks you through every screen, step by step, with a picture of each page.</p>
+  <div class="cover-meta">
+    <p style="margin:0"><strong>Version</strong> 0.1.0 &nbsp;·&nbsp; <strong>Environment</strong> Local development</p>
+    <p style="margin:6px 0 0"><strong>Web app</strong> http://localhost:3000 &nbsp;·&nbsp; <strong>Updated</strong> October 2026</p>
+  </div>
+</section>
+
+<!-- CONTENTS + PREREQS -->
+<section class="page">
+  <p class="step-num"><span class="badge">•</span> Overview</p>
+  <h2 class="serif">What is DataForge AI?</h2>
+  <p class="lede">DataForge AI is a secure workspace for asking questions of your business data. It answers with read-only SQL over your connected databases and cites the documents behind every result. Access is scoped to your organization and role, and every AI run is recorded in an audit log.</p>
+
+  <div class="toc">
+    <div class="toc-row"><span>1 · Start the application</span><span>Terminal</span></div>
+    <div class="toc-row"><span>2 · Sign in</span><span>Page 1</span></div>
+    <div class="toc-row"><span>3 · Dashboard</span><span>Page 2</span></div>
+    <div class="toc-row"><span>4 · AI Analyst</span><span>Page 3</span></div>
+    <div class="toc-row"><span>5 · Data Sources</span><span>Page 4</span></div>
+    <div class="toc-row"><span>6 · Documents</span><span>Page 5</span></div>
+    <div class="toc-row"><span>7 · Executions</span><span>Page 6</span></div>
+    <div class="toc-row"><span>8 · Execution detail</span><span>Page 7</span></div>
+    <div class="toc-row"><span>9 · Users &amp; Roles</span><span>Page 8</span></div>
+    <div class="toc-row"><span>10 · Audit Logs</span><span>Page 9</span></div>
+    <div class="toc-row"><span>11 · Settings</span><span>Page 10</span></div>
+    <div class="toc-row"><span>12 · On mobile</span><span>Page 11</span></div>
+  </div>
+
+  <h2 class="serif" style="font-size:22px;margin-top:22px">Before you begin</h2>
+  <ul class="plain">
+    <li><b>Docker Desktop</b> installed and running.</li>
+    <li>The repository checked out locally, with a <span class="k">.env</span> file at its root.</li>
+    <li>An account in your organization (or the seeded development logins below).</li>
+  </ul>
+  <div class="callout"><b>Development sign-in.</b> If you seeded the development data, sign in as <span class="k">owner@dataforge.local</span> with the password <span class="k">DataForge!Dev1</span>. The same password works for <span class="k">admin@</span>, <span class="k">analyst@</span> and <span class="k">viewer@dataforge.local</span>.</div>
+
+  <p class="footer-note">DataForge AI — User Guide</p>
+</section>
+
+<!-- STEP 1 -->
+<section class="page">
+  <p class="step-num"><span class="badge">1</span> Step one</p>
+  <h2 class="serif">Start the application</h2>
+  <p class="lede">The whole stack runs with Docker Compose. On Windows, double-click <span class="k">START.bat</span> in the repository root — a console window opens, starts all six services and waits until they are ready.</p>
+
+  <table class="urls">
+    <tr><th>Service</th><th>URL</th></tr>
+    <tr><td>Web application</td><td><code>http://localhost:3000</code></td></tr>
+    <tr><td>API root</td><td><code>http://localhost:8000</code></td></tr>
+    <tr><td>API health</td><td><code>http://localhost:8000/_health/</code></td></tr>
+    <tr><td>AI service health</td><td><code>http://localhost:8001/_health/</code></td></tr>
+  </table>
+
+  <div class="tips">
+    <div class="tip"><span class="dot">›</span><span>Wait for the message <span class="k">“DataForge AI is running … All six services are ready.”</span></span></div>
+    <div class="tip"><span class="dot">›</span><span>When you are finished for the day, double-click <span class="k">STOP.bat</span> to stop the stack. Your database and uploaded documents are kept.</span></div>
+  </div>
+
+  <div class="callout">Prefer the command line? Run <span class="k">docker compose up -d --build</span> and then open http://localhost:3000.</div>
+
+  <p class="footer-note">Step 1 · Start the application</p>
+</section>
+
+<!-- STEP 2 -->
+<section class="page">
+  <p class="step-num"><span class="badge">2</span> Step two</p>
+  <h2 class="serif">Sign in to your workspace</h2>
+  <p class="lede">Open http://localhost:3000. You will land on the sign-in page. Enter your work email and password, then select <span class="k">Sign in</span>.</p>
+  <div class="shot"><img src="screenshots/01-login.png" alt="Sign-in page" /></div>
+  <div class="tips">
+    <div class="tip"><span class="dot">›</span><span>Use the <span class="k">Show / Hide</span> control to reveal the password while typing.</span></div>
+    <div class="tip"><span class="dot">›</span><span>If sign-in fails, a message appears above the fields explaining why.</span></div>
+  </div>
+  <p class="footer-note">Step 2 · Sign in</p>
+</section>
+
+<!-- STEP 3 -->
+<section class="page">
+  <p class="step-num"><span class="badge">3</span> Step three</p>
+  <h2 class="serif">Dashboard</h2>
+  <p class="lede">The dashboard is your home screen — a live view of AI activity in your organization: totals for executions, successes, failures and runs in flight, plus the most recent executions and the most-used tools.</p>
+  <div class="shot"><img src="screenshots/02-dashboard.png" alt="Dashboard" /></div>
+  <div class="tips">
+    <div class="tip"><span class="dot">›</span><span>Every figure is computed from recorded executions — nothing is estimated.</span></div>
+    <div class="tip"><span class="dot">›</span><span>Use the left navigation to move between the areas described next.</span></div>
+  </div>
+  <p class="footer-note">Step 3 · Dashboard</p>
+</section>
+
+<!-- STEP 4 -->
+<section class="page">
+  <p class="step-num"><span class="badge">4</span> Step four</p>
+  <h2 class="serif">AI Analyst</h2>
+  <p class="lede">Ask a question in plain language. The analyst chooses tools, runs validated read-only SQL against the connected databases, searches your documents, and answers with its sources.</p>
+  <div class="shot"><img src="screenshots/03-analyst.png" alt="AI Analyst" /></div>
+  <div class="tips">
+    <div class="tip"><span class="dot">›</span><span>Type your question, optionally select the data sources to use, and select <span class="k">Ask the analyst</span>.</span></div>
+    <div class="tip"><span class="dot">›</span><span>Click one of the example questions to try it instantly.</span></div>
+  </div>
+  <p class="footer-note">Step 4 · AI Analyst</p>
+</section>
+
+<!-- STEP 5 -->
+<section class="page">
+  <p class="step-num"><span class="badge">5</span> Step five</p>
+  <h2 class="serif">Data Sources</h2>
+  <p class="lede">Connect the business databases the analyst may read. Add a source with a read-only account, test the connection, and sync its schema so the analyst knows which tables exist.</p>
+  <div class="shot"><img src="screenshots/04-data-sources.png" alt="Data Sources" /></div>
+  <div class="tips">
+    <div class="tip"><span class="dot">›</span><span>Select <span class="k">Add data source</span>, enter the connection details (PostgreSQL or MySQL) and create it.</span></div>
+    <div class="tip"><span class="dot">›</span><span>Use <span class="k">Test</span> to verify the connection, then <span class="k">Sync schema</span> to discover tables.</span></div>
+    <div class="tip"><span class="dot">›</span><span>Passwords are encrypted immediately and never returned to the browser.</span></div>
+  </div>
+  <p class="footer-note">Step 5 · Data Sources</p>
+</section>
+
+<!-- STEP 6 -->
+<section class="page">
+  <p class="step-num"><span class="badge">6</span> Step six</p>
+  <h2 class="serif">Documents</h2>
+  <p class="lede">Upload internal documents (PDF, DOCX or TXT) so the analyst can cite them when answering. Processing runs in the background; the status column shows progress.</p>
+  <div class="shot"><img src="screenshots/05-documents.png" alt="Documents" /></div>
+  <div class="tips">
+    <div class="tip"><span class="dot">›</span><span>Choose a file and select <span class="k">Upload</span>. Refresh to watch processing complete.</span></div>
+    <div class="tip"><span class="dot">›</span><span>If a document fails, use <span class="k">Retry</span> to reprocess it.</span></div>
+  </div>
+  <p class="footer-note">Step 6 · Documents</p>
+</section>
+
+<!-- STEP 7 -->
+<section class="page">
+  <p class="step-num"><span class="badge">7</span> Step seven</p>
+  <h2 class="serif">Executions</h2>
+  <p class="lede">Every AI run is recorded with the tools it used, its model, token usage and duration. Filter by status — All, Succeeded, Failed or Running — and select any row to open it.</p>
+  <div class="shot"><img src="screenshots/06-executions.png" alt="Executions" /></div>
+  <div class="tips">
+    <div class="tip"><span class="dot">›</span><span>Use the filter chips at the top to focus on failed runs that need attention.</span></div>
+    <div class="tip"><span class="dot">›</span><span>Select a question or run to see its full trace.</span></div>
+  </div>
+  <p class="footer-note">Step 7 · Executions</p>
+</section>
+
+<!-- STEP 8 -->
+<section class="page">
+  <p class="step-num"><span class="badge">8</span> Step eight</p>
+  <h2 class="serif">Execution detail</h2>
+  <p class="lede">Open a single run to see how it was answered: a summary of duration, tokens, provider and model, the answer itself, and a high-level trace of each tool invocation.</p>
+  <div class="shot"><img src="screenshots/07-execution-detail.png" alt="Execution detail" /></div>
+  <div class="tips">
+    <div class="tip"><span class="dot">›</span><span>The trace lists each step with its inputs and outputs, so you can see exactly what the analyst did.</span></div>
+    <div class="tip"><span class="dot">›</span><span>Private model reasoning is never stored or shown.</span></div>
+  </div>
+  <p class="footer-note">Step 8 · Execution detail</p>
+</section>
+
+<!-- STEP 9 -->
+<section class="page">
+  <p class="step-num"><span class="badge">9</span> Step nine</p>
+  <h2 class="serif">Users &amp; Roles</h2>
+  <p class="lede">Manage who belongs to your organization. Add a member by email and assign a role — Owner, Admin, Analyst or Viewer. Permissions follow the role.</p>
+  <div class="shot"><img src="screenshots/08-members.png" alt="Users and Roles" /></div>
+  <div class="tips">
+    <div class="tip"><span class="dot">›</span><span>Change a member's role inline with the role selector.</span></div>
+    <div class="tip"><span class="dot">›</span><span>Members with an Owner role cannot be removed from this screen.</span></div>
+  </div>
+  <p class="footer-note">Step 9 · Users &amp; Roles</p>
+</section>
+
+<!-- STEP 10 -->
+<section class="page">
+  <p class="step-num"><span class="badge">10</span> Step ten</p>
+  <h2 class="serif">Audit Logs</h2>
+  <p class="lede">Security-relevant events are recorded here — sign-ins, credential access, member changes and more — so you can see who did what, and when.</p>
+  <div class="shot"><img src="screenshots/09-audit.png" alt="Audit logs" /></div>
+  <div class="tips">
+    <div class="tip"><span class="dot">›</span><span>Use the audit log to investigate access to sensitive data sources.</span></div>
+  </div>
+  <p class="footer-note">Step 10 · Audit Logs</p>
+</section>
+
+<!-- STEP 11 -->
+<section class="page">
+  <p class="step-num"><span class="badge">11</span> Step eleven</p>
+  <h2 class="serif">Settings</h2>
+  <p class="lede">Review your account details and change your password. Changing the password signs out your other sessions for safety.</p>
+  <div class="shot"><img src="screenshots/10-settings.png" alt="Settings" /></div>
+  <div class="tips">
+    <div class="tip"><span class="dot">›</span><span>New passwords must be at least 10 characters and not commonly used.</span></div>
+    <div class="tip"><span class="dot">›</span><span>Use <span class="k">Sign out</span> at the bottom of the navigation when you are done.</span></div>
+  </div>
+  <p class="footer-note">Step 11 · Settings</p>
+</section>
+
+<!-- STEP 12 -->
+<section class="page">
+  <p class="step-num"><span class="badge">12</span> Step twelve</p>
+  <h2 class="serif">On mobile</h2>
+  <div class="mobile-wrap">
+    <div class="shot"><img src="screenshots/11-login-mobile.png" alt="Mobile sign-in" /></div>
+    <div class="mobile-copy">
+      <p class="lede">The interface is fully responsive. On a phone or narrow window the top navigation collapses and the layout adapts, so you can sign in and use every screen on the go.</p>
+      <ul class="plain">
+        <li>Same sign-in and credentials.</li>
+        <li>Navigation moves to a compact header.</li>
+        <li>Tables scroll horizontally where needed.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="footer-note">Step 12 · Mobile</p>
+</section>
+
+<!-- CLOSING -->
+<section class="page">
+  <p class="step-num"><span class="badge">✓</span> Done</p>
+  <h2 class="serif">You’re ready to go</h2>
+  <p class="lede">You have now seen every part of DataForge AI. A typical session looks like this:</p>
+  <ul class="plain">
+    <li><b>Start</b> the stack with START.bat and sign in.</li>
+    <li><b>Connect</b> a read-only data source and sync its schema.</li>
+    <li><b>Upload</b> any documents you want the analyst to cite.</li>
+    <li><b>Ask</b> a question in the AI Analyst and review the answer with its sources.</li>
+    <li><b>Check</b> Executions and Audit Logs to see what happened.</li>
+    <li><b>Stop</b> with STOP.bat — your data is preserved for next time.</li>
+  </ul>
+  <div class="callout" style="margin-top:20px"><b>Good to know.</b> The AI service needs <span class="k">LLM_API_KEY</span> and <span class="k">EMBEDDING_API_KEY</span> in <span class="k">.env</span> to answer analyst questions. The stack runs and every other feature works without them; analyst runs fail with a clear error until they are set.</div>
+  <p class="footer-note">DataForge AI — User Guide · End</p>
+</section>
+
+</body>
+</html>
