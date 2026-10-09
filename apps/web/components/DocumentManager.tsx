@@ -83,7 +83,7 @@ export function DocumentManager({
     <div className="space-y-4">
       {error ? <ErrorBanner message={error.message} code={error.code} /> : null}
       {notice ? (
-        <div role="status" className="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-[var(--color-ok)]">
+        <div role="status" className="rounded-lg border border-emerald-400/25 bg-emerald-400/10 px-4 py-3 text-sm text-[var(--color-ok)]">
           {notice}
         </div>
       ) : null}

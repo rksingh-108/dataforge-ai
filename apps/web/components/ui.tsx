@@ -10,7 +10,7 @@ export function Card({
   as?: "section" | "div" | "article";
 }) {
   return (
-    <Tag className={`rounded-lg border border-[var(--color-line)] bg-white shadow-sm ${className}`}>
+    <Tag className={`rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] ${className}`}>
       {children}
     </Tag>
   );
@@ -42,7 +42,7 @@ export function PageHeader({ title, description, actions }: {
   return (
     <header className="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-[var(--color-ink-900)]">{title}</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-[var(--color-ink-900)]">{title}</h1>
         {description ? (
           <p className="mt-1 max-w-2xl text-sm text-[var(--color-ink-500)]">{description}</p>
         ) : null}
@@ -55,11 +55,11 @@ export function PageHeader({ title, description, actions }: {
 type BadgeTone = "neutral" | "ok" | "warn" | "danger" | "brand";
 
 const TONES: Record<BadgeTone, string> = {
-  neutral: "bg-slate-100 text-slate-700 border-slate-200",
-  ok: "bg-green-50 text-[var(--color-ok)] border-green-200",
-  warn: "bg-amber-50 text-[var(--color-warn)] border-amber-200",
-  danger: "bg-red-50 text-[var(--color-danger)] border-red-200",
-  brand: "bg-[var(--color-brand-50)] text-[var(--color-brand-700)] border-[var(--color-brand-100)]",
+  neutral: "bg-white/5 text-[var(--color-ink-700)] border-white/10",
+  ok: "bg-emerald-400/10 text-[var(--color-ok)] border-emerald-400/25",
+  warn: "bg-amber-400/10 text-[var(--color-warn)] border-amber-400/25",
+  danger: "bg-red-400/10 text-[var(--color-danger)] border-red-400/25",
+  brand: "bg-[var(--color-brand-500)]/10 text-[var(--color-brand-300)] border-[var(--color-brand-500)]/25",
 };
 
 export function Badge({ children, tone = "neutral" }: { children: ReactNode; tone?: BadgeTone }) {
@@ -106,7 +106,7 @@ export function ErrorBanner({ message, code }: { message: string; code?: string 
   return (
     <div
       role="alert"
-      className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-[var(--color-danger)]"
+      className="rounded-lg border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm text-red-200"
     >
       <p className="font-medium">{message}</p>
       {code ? <p className="mt-1 text-xs opacity-80">Reference: {code}</p> : null}
@@ -130,7 +130,7 @@ export function SkeletonRows({ rows = 4 }: { rows?: number }) {
   return (
     <div className="space-y-2 p-5" aria-hidden="true">
       {Array.from({ length: rows }).map((_, index) => (
-        <div key={index} className="h-8 animate-pulse rounded bg-slate-100" />
+        <div key={index} className="h-8 animate-pulse rounded bg-white/5" />
       ))}
     </div>
   );
@@ -138,7 +138,7 @@ export function SkeletonRows({ rows = 4 }: { rows?: number }) {
 
 export function StatTile({ label, value, hint }: { label: string; value: ReactNode; hint?: string }) {
   return (
-    <Card className="p-5">
+    <Card className="df-hover p-5">
       <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-ink-500)]">{label}</p>
       <p className="mt-2 text-2xl font-semibold text-[var(--color-ink-900)]">{value}</p>
       {hint ? <p className="mt-1 text-xs text-[var(--color-ink-500)]">{hint}</p> : null}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { LogoMark } from "@/components/Logo";
 import { LogoutButton } from "@/components/LogoutButton";
 import { OrgSwitcher } from "@/components/OrgSwitcher";
 import { Sidebar } from "@/components/Sidebar";
@@ -12,14 +13,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen">
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-[var(--color-line)] bg-white md:flex">
+      <aside className="hidden w-64 shrink-0 flex-col border-r border-[var(--color-line)] bg-[var(--color-surface)] md:flex">
         <div className="border-b border-[var(--color-line)] px-4 py-4">
-          <Link href="/dashboard" className="block">
-            <span className="text-sm font-semibold tracking-tight text-[var(--color-ink-900)]">
-              DataForge AI
-            </span>
-            <span className="mt-0.5 block text-xs text-[var(--color-ink-500)]">
-              Business data intelligence
+          <Link href="/dashboard" className="flex items-center gap-3">
+            <LogoMark className="h-9 w-9" />
+            <span className="flex flex-col">
+              <span className="text-sm font-semibold tracking-tight text-[var(--color-ink-900)]">
+                DataForge AI
+              </span>
+              <span className="text-xs text-[var(--color-ink-500)]">Business data intelligence</span>
             </span>
           </Link>
         </div>
@@ -45,11 +47,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between gap-4 border-b border-[var(--color-line)] bg-white px-4 py-3 md:hidden">
-          <span className="text-sm font-semibold">DataForge AI</span>
+        <header className="flex items-center justify-between gap-4 border-b border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-3 md:hidden">
+          <span className="flex items-center gap-2 text-sm font-semibold">
+            <LogoMark className="h-6 w-6" />
+            DataForge AI
+          </span>
           <span className="text-xs text-[var(--color-ink-500)]">{membership.organization_name}</span>
         </header>
-        <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-6 md:py-8">
+        <main id="main" className="df-fade mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-6 md:py-8">
           {children}
         </main>
       </div>

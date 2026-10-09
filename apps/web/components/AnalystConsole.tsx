@@ -86,7 +86,7 @@ export function AnalystConsole({
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
             placeholder="e.g. What was total revenue for the last quarter?"
-            className="w-full resize-y rounded-md border border-[var(--color-line)] px-3 py-2 text-sm"
+            className="w-full resize-y rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-2)] px-3 py-2 text-sm text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
           />
           <p className="text-xs text-[var(--color-ink-500)]">
             Answers are grounded in your connected data and documents. The model never receives
@@ -113,7 +113,7 @@ export function AnalystConsole({
                       className={`rounded-full border px-3 py-1 text-xs font-medium ${
                         active
                           ? "border-[var(--color-brand-500)] bg-[var(--color-brand-50)] text-[var(--color-brand-700)]"
-                          : "border-[var(--color-line)] bg-white text-[var(--color-ink-700)]"
+                          : "border-[var(--color-line)] bg-white/5 text-[var(--color-ink-700)] hover:bg-white/10"
                       }`}
                     >
                       {source.name} · {source.engine} · {source.tableCount} tables
@@ -166,7 +166,7 @@ export function AnalystConsole({
                   <button
                     type="button"
                     onClick={() => setQuestion(example)}
-                    className="rounded-full border border-[var(--color-line)] px-3 py-1 text-xs hover:bg-slate-50"
+                    className="rounded-full border border-[var(--color-line)] bg-white/5 px-3 py-1 text-xs text-[var(--color-ink-700)] transition hover:bg-white/10 hover:text-[var(--color-ink-900)]"
                   >
                     {example}
                   </button>
@@ -223,7 +223,7 @@ function ResultPanel({ execution }: { execution: Execution }) {
 
       <section aria-label="Answer">
         <h3 className="mb-2 text-sm font-semibold text-[var(--color-ink-900)]">Answer</h3>
-        <div className="whitespace-pre-wrap rounded-md border border-[var(--color-line)] bg-white p-4 text-sm text-[var(--color-ink-900)]">
+        <div className="whitespace-pre-wrap rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-2)] p-4 text-sm text-[var(--color-ink-900)]">
           {execution.answer || "No answer was produced."}
         </div>
       </section>

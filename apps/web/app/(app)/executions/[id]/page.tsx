@@ -49,7 +49,7 @@ export default async function ExecutionDetailPage({
       </div>
 
       {execution.error ? (
-        <Card className="border-red-200 bg-red-50 p-5">
+        <Card className="border-red-400/25 bg-red-400/10 p-5">
           <p className="text-sm font-medium text-[var(--color-danger)]">{execution.error}</p>
         </Card>
       ) : null}

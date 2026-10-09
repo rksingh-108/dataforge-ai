@@ -72,7 +72,7 @@ export function Sidebar({ permissions }: { permissions: readonly string[] }) {
             className={`rounded-md px-3 py-2 text-sm font-medium transition ${
               active
                 ? "bg-[var(--color-brand-50)] text-[var(--color-brand-700)]"
-                : "text-[var(--color-ink-700)] hover:bg-slate-100"
+                : "text-[var(--color-ink-700)] hover:bg-white/5 hover:text-[var(--color-ink-900)]"
             }`}
           >
             {item.label}

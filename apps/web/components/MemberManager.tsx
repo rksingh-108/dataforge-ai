@@ -105,7 +105,7 @@ export function MemberManager({
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="w-64 rounded-md border border-[var(--color-line)] px-3 py-2 text-sm"
+                className="w-64 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-2)] px-3 py-2 text-sm text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
               />
             </div>
             <div className="space-y-1">
@@ -116,7 +116,7 @@ export function MemberManager({
                 id="member-role"
                 value={role}
                 onChange={(event) => setRole(event.target.value)}
-                className="rounded-md border border-[var(--color-line)] px-3 py-2 text-sm"
+                className="rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-2)] px-3 py-2 text-sm text-[var(--color-ink-900)]"
               >
                 {ROLES.map((value) => (
                   <option key={value} value={value}>{titleCase(value)}</option>
@@ -163,7 +163,7 @@ export function MemberManager({
                             value={member.role}
                             disabled={busy === `role:${member.id}`}
                             onChange={(event) => void onChangeRole(member, event.target.value)}
-                            className="rounded-md border border-[var(--color-line)] px-2 py-1 text-sm"
+                            className="rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-2)] px-2 py-1 text-sm text-[var(--color-ink-900)]"
                           >
                             {ROLES.map((value) => (
                               <option key={value} value={value}>{titleCase(value)}</option>

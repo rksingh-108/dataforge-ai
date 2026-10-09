@@ -51,7 +51,7 @@ export default async function ExecutionsPage({
               className={`rounded-full border px-3 py-1 text-xs font-medium ${
                 active
                   ? "border-[var(--color-brand-500)] bg-[var(--color-brand-50)] text-[var(--color-brand-700)]"
-                  : "border-[var(--color-line)] bg-white text-[var(--color-ink-700)]"
+                  : "border-[var(--color-line)] bg-white/5 text-[var(--color-ink-700)] hover:bg-white/10"
               }`}
             >
               {filter.label}
@@ -111,7 +111,7 @@ export default async function ExecutionsPage({
           <Link
             href={`/executions?${new URLSearchParams({ ...(status ? { status } : {}), page: String(Math.max(1, page - 1)) }).toString()}`}
             aria-disabled={page <= 1}
-            className={page <= 1 ? "pointer-events-none text-slate-300" : "text-[var(--color-brand-600)]"}
+            className={page <= 1 ? "pointer-events-none text-[var(--color-ink-500)] opacity-50" : "text-[var(--color-brand-600)]"}
           >
             ← Previous
           </Link>
@@ -121,7 +121,7 @@ export default async function ExecutionsPage({
           <Link
             href={`/executions?${new URLSearchParams({ ...(status ? { status } : {}), page: String(Math.min(executions.total_pages, page + 1)) }).toString()}`}
             aria-disabled={page >= executions.total_pages}
-            className={page >= executions.total_pages ? "pointer-events-none text-slate-300" : "text-[var(--color-brand-600)]"}
+            className={page >= executions.total_pages ? "pointer-events-none text-[var(--color-ink-500)] opacity-50" : "text-[var(--color-brand-600)]"}
           >
             Next →
           </Link>

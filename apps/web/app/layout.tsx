@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen">
         <a
           href="#main"
-          className="sr-only sr-only-focusable absolute left-2 top-2 z-50 rounded bg-white text-sm"
+          className="sr-only sr-only-focusable absolute left-2 top-2 z-50 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] text-sm"
         >
           Skip to content
         </a>

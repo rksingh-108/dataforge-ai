@@ -1,29 +1,39 @@
 @import "tailwindcss";
 
 /*
- * DataForge AI design tokens.
- * Kept deliberately small: a neutral base, one brand accent, and semantic
- * status colours. Components use these via Tailwind utilities.
+ * DataForge AI design tokens — premium dark theme.
+ * Near-black surfaces with a single warm gold accent, an editorial serif for
+ * display headings, and generous neutral text. Components consume these via
+ * Tailwind utilities, so the whole product inherits the theme from here.
  */
 @theme {
-  --color-brand-50: #eef4ff;
-  --color-brand-100: #d9e5ff;
-  --color-brand-500: #3b6ef6;
-  --color-brand-600: #2f59d0;
-  --color-brand-700: #2646a6;
-  --color-ink-900: #0f172a;
-  --color-ink-700: #334155;
-  --color-ink-500: #64748b;
-  --color-line: #e2e8f0;
-  --color-surface: #ffffff;
-  --color-canvas: #f7f9fc;
-  --color-ok: #15803d;
-  --color-warn: #b45309;
-  --color-danger: #b91c1c;
+  --color-canvas: #09090b;
+  --color-surface: #121216;
+  --color-surface-2: #1a1a20;
+  --color-line: #26262e;
+
+  --color-ink-900: #f4f1ea;
+  --color-ink-700: #c6c2b8;
+  --color-ink-500: #8a867e;
+
+  --color-brand-50: #241b0c;
+  --color-brand-100: #3a2c12;
+  --color-brand-300: #f2ce8e;
+  --color-brand-400: #e9bd6e;
+  --color-brand-500: #e0a33c;
+  --color-brand-600: #d99a30;
+  --color-brand-700: #f0c98a;
+
+  --color-ok: #5fd39a;
+  --color-warn: #f0b354;
+  --color-danger: #f08a8a;
+
+  --font-display: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
+    Cambria, "Times New Roman", serif;
 }
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 html,
@@ -33,6 +43,11 @@ body {
 
 body {
   background-color: var(--color-canvas);
+  /* Warm ambient wash behind every page. */
+  background-image:
+    radial-gradient(60% 45% at 50% -10%, rgba(224, 163, 60, 0.1), transparent 70%),
+    radial-gradient(40% 40% at 100% 0%, rgba(224, 163, 60, 0.05), transparent 70%);
+  background-attachment: fixed;
   color: var(--color-ink-900);
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -42,6 +57,103 @@ body {
 :focus-visible {
   outline: 2px solid var(--color-brand-500);
   outline-offset: 2px;
+}
+
+::selection {
+  background: rgba(224, 163, 60, 0.3);
+}
+
+/* ---------------------------------------------------------------------------
+ * Motion. All animations collapse under prefers-reduced-motion (below).
+ * ------------------------------------------------------------------------ */
+@keyframes df-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes df-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes df-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes df-glow {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.07);
+  }
+}
+
+.df-reveal {
+  animation: df-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.df-fade {
+  animation: df-fade-in 0.9s ease both;
+}
+
+.df-float {
+  animation: df-float 9s ease-in-out infinite;
+}
+
+.df-glow {
+  animation: df-glow 7s ease-in-out infinite;
+}
+
+.df-delay-1 {
+  animation-delay: 0.08s;
+}
+
+.df-delay-2 {
+  animation-delay: 0.16s;
+}
+
+.df-delay-3 {
+  animation-delay: 0.24s;
+}
+
+.df-delay-4 {
+  animation-delay: 0.32s;
+}
+
+.df-delay-5 {
+  animation-delay: 0.4s;
+}
+
+/* Subtle lift for interactive surfaces. */
+.df-hover {
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.df-hover:hover {
+  transform: translateY(-2px);
 }
 
 /* Respect users who prefer reduced motion. */

@@ -134,7 +134,7 @@ export function DataSourceManager({
       {notice ? (
         <div
           role="status"
-          className="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-[var(--color-ok)]"
+          className="rounded-lg border border-emerald-400/25 bg-emerald-400/10 px-4 py-3 text-sm text-[var(--color-ok)]"
         >
           {notice}
         </div>
@@ -286,7 +286,8 @@ function Field({
   as?: "input" | "select";
   options?: string[];
 }) {
-  const className = "w-full rounded-md border border-[var(--color-line)] px-3 py-2 text-sm";
+  const className =
+    "w-full rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-2)] px-3 py-2 text-sm text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]";
   return (
     <div className="space-y-1">
       <label htmlFor={id} className="block text-sm font-medium text-[var(--color-ink-700)]">

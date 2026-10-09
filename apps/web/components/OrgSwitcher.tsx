@@ -50,7 +50,7 @@ export function OrgSwitcher({
         value={activeId}
         disabled={pending}
         onChange={(event) => void onChange(event.target.value)}
-        className="w-full rounded-md border border-[var(--color-line)] bg-white px-2 py-1.5 text-sm"
+        className="w-full rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-2)] px-2 py-1.5 text-sm text-[var(--color-ink-900)]"
       >
         {memberships.map((membership) => (
           <option key={membership.organization_id} value={membership.organization_id}>
